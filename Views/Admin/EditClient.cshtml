@@ -1,0 +1,57 @@
+@model Data.Entities.Client
+@{
+    ViewData["Title"] = "Modifier un Client";
+}
+
+<div class="container">
+    <h1 class="mb-4">✏️ Modifier un Client</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="EditClient" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="FirstName" class="form-label">Prénom *</label>
+                    <input asp-for="FirstName" class="form-control" required />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LastName" class="form-label">Nom *</label>
+                    <input asp-for="LastName" class="form-control" required />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email *</label>
+                    <input asp-for="Email" class="form-control" type="email" required />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label">Téléphone *</label>
+                    <input asp-for="Phone" class="form-control" required />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">Nouveau mot de passe (laisser vide pour ne pas changer)</label>
+                    <input asp-for="Password" class="form-control" type="password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">✅ Enregistrer</button>
+                    <a asp-action="Clients" class="btn btn-secondary">❌ Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

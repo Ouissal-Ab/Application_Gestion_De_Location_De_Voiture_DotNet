@@ -1,0 +1,97 @@
+@{
+    ViewData["Title"] = "Tableau de bord Admin";
+    var stats = ViewBag.Stats as dynamic;
+}
+
+<div class="container-fluid">
+    <h1 class="mb-4">👨‍💼 Tableau de bord Administrateur</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">🚗 Total Véhicules</h5>
+                    <h2 class="mb-0">@(stats?.TotalVehicles ?? 0)</h2>
+                    <small>@(stats?.AvailableVehicles ?? 0) disponibles</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">👥 Total Clients</h5>
+                    <h2 class="mb-0">@(stats?.TotalClients ?? 0)</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">📋 Total Locations</h5>
+                    <h2 class="mb-0">@(stats?.TotalRentals ?? 0)</h2>
+                    <small>@(stats?.PendingRentals ?? 0) en attente</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">💰 Revenus Totaux</h5>
+                    <h2 class="mb-0">@(stats?.TotalRevenue.ToString("C") ?? "0,00 €")</h2>
+                    <small>@(stats?.ActiveRentals ?? 0) actives</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🚗 Gestion des Véhicules</h5>
+                    <p class="card-text">Gérez le parc automobile</p>
+                    <a asp-action="Vehicles" class="btn btn-primary">Voir les véhicules</a>
+                    <a asp-action="CreateVehicle" class="btn btn-outline-primary mt-2">Ajouter un véhicule</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">👥 Gestion des Clients</h5>
+                    <p class="card-text">Gérez les comptes clients</p>
+                    <a asp-action="Clients" class="btn btn-info">Voir les clients</a>
+                    <a asp-action="CreateClient" class="btn btn-outline-info mt-2">Ajouter un client</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📋 Gestion des Locations</h5>
+                    <p class="card-text">Consultez et gérez les locations</p>
+                    <a asp-action="Rentals" class="btn btn-warning">Voir les locations</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

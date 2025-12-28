@@ -1,0 +1,66 @@
+@model IEnumerable<Data.Entities.Rental>
+@{
+    ViewData["Title"] = "Mes Réservations";
+    var rentals = Model ?? new List<Data.Entities.Rental>();
+}
+
+<div class="text-center mb-4">
+    <h2 class="display-5">📋 Mes Réservations</h2>
+    <p class="lead">Consultez toutes vos demandes de location</p>
+</div>
+<hr />
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        <h5>❌ @ViewBag.ErrorMessage</h5>
+    </div>
+}
+
+@if (rentals.Any())
+{
+    <div class="row">
+        @foreach (var rental in rentals)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow">
+                    <div class="card-header @(rental.Status == "Confirmed" ? "bg-success" : rental.Status == "Pending" ? "bg-warning" : rental.Status == "Completed" ? "bg-info" : "bg-secondary") text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Réservation #@rental.Id</h5>
+                            <span class="badge bg-light text-dark">@rental.Status</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">🚗 @rental.Vehicle.Brand @rental.Vehicle.Model (@rental.Vehicle.Year)</h6>
+                        <p class="card-text">
+                            <strong>📅 Date de début:</strong> @rental.StartDate.ToString("dd/MM/yyyy")<br />
+                            <strong>📅 Date de fin:</strong> @rental.EndDate.ToString("dd/MM/yyyy")<br />
+                            <strong>⏱️ Durée:</strong> @((rental.EndDate - rental.StartDate).Days) jour(s)<br />
+                            <strong>💰 Montant total:</strong> <span class="text-primary fw-bold fs-5">@rental.TotalAmount.ToString("C")</span><br />
+                            <strong>📆 Date de création:</strong> @rental.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </p>
+                        <div class="mt-3">
+                            <a asp-action="DownloadPdf" asp-route-id="@rental.Id" class="btn btn-primary btn-sm me-2" target="_blank">
+                                📄 Télécharger le PDF
+                            </a>
+                            <a asp-action="QrCode" asp-route-id="@rental.Id" class="btn btn-outline-primary btn-sm" target="_blank">
+                                📱 Voir le QR Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info text-center">
+        <h5>😔 Aucune réservation trouvée</h5>
+        <p>Vous n'avez pas encore effectué de réservation.</p>
+        <a asp-controller="Vehicles" asp-action="Index" class="btn btn-primary mt-3">
+            🚗 Voir les véhicules disponibles
+        </a>
+    </div>
+}
+

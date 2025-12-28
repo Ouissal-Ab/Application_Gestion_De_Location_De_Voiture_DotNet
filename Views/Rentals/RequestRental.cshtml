@@ -1,0 +1,120 @@
+@model FrontOffice.Web.Models.RentalRequestViewModel
+@{
+    ViewData["Title"] = "Demande de Location";
+}
+
+<div class="mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">🚗 Demande de Location</h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.VehicleInfo))
+                    {
+                        <div class="alert alert-info mb-4">
+                            <h5>📋 Informations du véhicule</h5>
+                            <p class="mb-1"><strong>Véhicule:</strong> @Model.VehicleInfo</p>
+                            @if (Model.DailyRate.HasValue)
+                            {
+                                <p class="mb-0"><strong>Tarif journalier:</strong> <span class="text-primary fw-bold">@Model.DailyRate.Value.ToString("C")</span></p>
+                            }
+                        </div>
+                    }
+
+                    <form asp-action="RequestRental" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="VehicleId" />
+                        <input type="hidden" asp-for="VehicleInfo" />
+                        <input type="hidden" asp-for="DailyRate" />
+
+                        <div class="form-group mb-3">
+                            <label asp-for="StartDate" class="form-label fw-bold">📅 Date de début</label>
+                            <input asp-for="StartDate" class="form-control" type="date" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="EndDate" class="form-label fw-bold">📅 Date de fin</label>
+                            <input asp-for="EndDate" class="form-control" type="date" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+
+                        @if (Model.DailyRate.HasValue)
+                        {
+                            var days = Model.StartDate != default && Model.EndDate != default ? (Model.EndDate - Model.StartDate).Days : 1;
+                            var totalAmount = Model.DailyRate.Value * (days > 0 ? days : 1);
+                            <div class="alert alert-success mb-3" id="totalAmountSection">
+                                <h6>💰 Montant estimé</h6>
+                                <p class="mb-1" id="totalAmountText">
+                                    <strong>Durée:</strong> <span id="daysCount">@(days > 0 ? days : 1)</span> jour(s)<br />
+                                    <strong>Total:</strong> <span class="fw-bold fs-5" id="totalAmount">@totalAmount.ToString("C")</span>
+                                </p>
+                            </div>
+                        }
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-controller="Vehicles" asp-action="Index" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">✅ Confirmer la demande</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Calculer automatiquement le montant total quand les dates changent
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.querySelector('input[name="StartDate"]');
+            const endDateInput = document.querySelector('input[name="EndDate"]');
+            const dailyRate = @(Model.DailyRate?.ToString("0.00") ?? "0");
+            
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('fr-FR', { 
+                    style: 'currency', 
+                    currency: 'EUR' 
+                }).format(amount);
+            }
+            
+            function updateTotal() {
+                if (!startDateInput.value || !endDateInput.value) {
+                    return;
+                }
+                
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+                
+                if (endDate <= startDate) {
+                    return;
+                }
+                
+                const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                const total = dailyRate * days;
+                
+                // Mettre à jour l'affichage si l'élément existe
+                const daysCountElement = document.getElementById('daysCount');
+                const totalAmountElement = document.getElementById('totalAmount');
+                
+                if (daysCountElement && totalAmountElement && dailyRate > 0) {
+                    daysCountElement.textContent = days;
+                    totalAmountElement.textContent = formatCurrency(total);
+                }
+            }
+            
+            if (startDateInput && endDateInput && dailyRate > 0) {
+                startDateInput.addEventListener('change', updateTotal);
+                endDateInput.addEventListener('change', updateTotal);
+                // Calculer au chargement initial
+                updateTotal();
+            }
+        });
+    </script>
+}
+

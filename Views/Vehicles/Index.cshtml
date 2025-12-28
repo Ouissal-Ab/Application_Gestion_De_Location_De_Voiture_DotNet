@@ -1,0 +1,76 @@
+@model IEnumerable<Data.Entities.Vehicle>
+@{
+    ViewData["Title"] = "Véhicules Disponibles";
+    var vehicles = Model ?? new List<Data.Entities.Vehicle>();
+}
+
+<div class="text-center mb-4">
+    <h2 class="display-5">🚗 Véhicules Disponibles</h2>
+    <p class="lead">Choisissez le véhicule qui correspond à vos besoins</p>
+</div>
+<hr />
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        <h5>❌ @ViewBag.ErrorMessage</h5>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        <h5>✅ @TempData["SuccessMessage"]</h5>
+        @if (TempData["RentalId"] != null)
+        {
+            <div class="mt-3">
+                <a asp-controller="Rentals" asp-action="QrCode" asp-route-id="@TempData["RentalId"]" class="btn btn-light me-2" target="_blank">
+                    📱 Voir le QR Code
+                </a>
+                <a asp-controller="Rentals" asp-action="DownloadPdf" asp-route-id="@TempData["RentalId"]" class="btn btn-light" target="_blank">
+                    📄 Télécharger le PDF
+                </a>
+            </div>
+        }
+    </div>
+}
+
+<div class="row">
+    @foreach (var vehicle in vehicles)
+    {
+        <div class="col-md-4 mb-4 vehicle-card">
+            <div class="card h-100">
+                <div class="card-img-top" style="height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: bold;">
+                    🚗
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@vehicle.Brand @vehicle.Model</h5>
+                    <p class="card-text flex-grow-1">
+                        <strong>Année:</strong> @vehicle.Year<br />
+                        <strong>Couleur:</strong> @vehicle.Color<br />
+                        <strong>Plaque:</strong> @vehicle.LicensePlate<br />
+                        <strong>Tarif journalier:</strong> <span class="text-primary fw-bold">@vehicle.DailyRate.ToString("C")</span><br />
+                        @if (!string.IsNullOrEmpty(vehicle.Description))
+                        {
+                            <strong>Description:</strong> @vehicle.Description<br />
+                        }
+                    </p>
+                    <div class="mt-auto">
+                        <a asp-controller="Rentals" asp-action="RequestRental" asp-route-vehicleId="@vehicle.Id" class="btn btn-primary w-100">
+                            🚙 Louer ce véhicule
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!vehicles.Any())
+{
+    <div class="alert alert-info text-center">
+        <h5>😔 Aucun véhicule disponible pour le moment</h5>
+        <p>Veuillez réessayer plus tard.</p>
+    </div>
+}
+
